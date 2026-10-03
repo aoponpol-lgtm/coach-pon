@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <title>Coach Pon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e4572e">
+  <!-- ไอคอน: iPhone/iPad -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Coach Pon">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <!-- ไอคอน: Chrome/Edge บนคอม และ Android -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #f5f6f8; color: #1f2933;
+      font: 15px/1.55 'IBM Plex Sans Thai', -apple-system, 'Segoe UI', sans-serif; }
+    #login { min-height: 100%; display: grid; place-items: center; padding: 24px 16px;
+      padding-top: calc(24px + env(safe-area-inset-top)); }
+    .box { width: 100%; max-width: 360px; text-align: center; }
+    .logo { width: 88px; height: 88px; border-radius: 22px; margin: 0 auto 16px; display: block; }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    .muted { color: #6b7785; margin: 0 0 24px; }
+    #gbtn { display: flex; justify-content: center; min-height: 44px; }
+    #msg { margin-top: 18px; padding: 12px; border-radius: 10px; background: #fde8e8; color: #b91c1c; }
+    #msg.info { background: #eef0f3; color: #1f2933; }
+    #app { position: fixed; inset: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); background: #f5f6f8; }
+    #app iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .hint { margin-top: 28px; font-size: 13px; color: #6b7785; }
+  </style>
+</head>
+<body>
+  <div id="login" hidden>
+    <div class="box">
+      <img class="logo" src="icons/icon-192.png" alt="">
+      <h1>Coach Pon</h1>
+      <p class="muted">ระบบติดตามการฝึกของลูกเทรน</p>
+      <div id="gbtn"></div>
+      <div id="msg" hidden></div>
+      <p class="hint" id="hint"></p>
+    </div>
+  </div>
+  <div id="app" hidden></div>
+
+  <script src="config.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async onload="initGoogle()"></script>
+  <script>
+    const CFG = window.CP_CONFIG;
+    const KEY = 'cp_session';
+    const $ = (id) => document.getElementById(id);
+
+    function store(v) {
+      try { v === null ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, v); } catch (e) {}
+    }
+    function stored() {
+      try { return localStorage.getItem(KEY); } catch (e) { return null; }
+    }
+
+    // ส่งคำขอไปหลังบ้าน (Content-Type text/plain เพื่อไม่ให้ติด CORS preflight)
+    async function api(body) {
+      const res = await fetch(CFG.EXEC_URL, { method: 'POST', body: JSON.stringify(body) });
+      return res.json();
+    }
+
+    function showMsg(text, info) {
+      const m = $('msg');
+      m.textContent = text; m.hidden = !text; m.className = info ? 'info' : '';
+    }
+
+    function showLogin(message, info) {
+      $('app').hidden = true; $('app').innerHTML = '';
+      $('login').hidden = false;
+      showMsg(message || '', info);
+    }
+
+    function showApp(token) {
+      $('login').hidden = true;
+      const f = document.createElement('iframe');
+      f.src = CFG.EXEC_URL + '?s=' + encodeURIComponent(token);
+      f.title = 'Coach Pon';
+      $('app').innerHTML = ''; $('app').appendChild(f); $('app').hidden = false;
+    }
+
+    function initGoogle() {
+      google.accounts.id.initialize({
+        client_id: CFG.CLIENT_ID,
+        callback: onCredential,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      google.accounts.id.renderButton($('gbtn'), {
+        theme: 'filled_blue', size: 'large', shape: 'pill', text: 'signin_with', locale: 'th', width: 280,
+      });
+    }
+
+    async function onCredential(resp) {
+      showMsg('กำลังตรวจสอบสิทธิ์…', true);
+      try {
+        const r = await api({ action: 'login', idToken: resp.credential });
+        if (r.ok) { store(r.token); showMsg(''); showApp(r.token); return; }
+        if (r.error === 'not_allowed') {
+          showMsg('บัญชี ' + r.email + ' ยังไม่มีสิทธิ์ใช้งาน กรุณาแจ้งโค้ชให้เพิ่มอีเมลนี้');
+        } else {
+          showMsg('เข้าสู่ระบบไม่สำเร็จ (' + r.error + ') ลองใหม่อีกครั้ง');
+        }
+      } catch (e) {
+        showMsg('เชื่อมต่อระบบไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่');
+      }
+    }
+
+    // ข้อความจากหน้าแอปที่ฝังอยู่ (Apps Script)
+    window.addEventListener('message', async (ev) => {
+      let host = '';
+      try { host = new URL(ev.origin).hostname; } catch (e) { return; }
+      if (!(host.endsWith('.googleusercontent.com') || host === 'script.google.com')) return;
+      const type = ev.data && ev.data.type;
+      if (type === 'cp-auth-expired') {
+        store(null);
+        showLogin('การเข้าสู่ระบบหมดอายุ หรือถูกปิดสิทธิ์ กรุณาเข้าสู่ระบบใหม่', true);
+      } else if (type === 'cp-logout') {
+        const t = stored();
+        store(null);
+        try { google.accounts.id.disableAutoSelect(); } catch (e) {}
+        showLogin('ออกจากระบบแล้ว', true);
+        if (t) api({ action: 'logout', token: t }).catch(() => {});
+      }
+    });
+
+    // คำแนะนำติดตั้งไอคอนตามอุปกรณ์
+    (function hint() {
+      const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+      if (standalone) return;
+      const ua = navigator.userAgent;
+      const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      $('hint').textContent = ios
+        ? 'เพิ่มไอคอนบนหน้าจอ: กดปุ่มแชร์ (□↑) → "เพิ่มไปยังหน้าจอโฮม"'
+        : 'เพิ่มไอคอนบนคอม: Chrome เมนู ⋮ → "แคสต์ บันทึก และแชร์" → "ติดตั้งหน้าเว็บเป็นแอป"';
+    })();
+
+    // เริ่มต้น: ถ้ามี session เดิมให้ตรวจก่อน
+    (async function start() {
+      const t = stored();
+      if (!t) return showLogin();
+      try {
+        const r = await api({ action: 'check', token: t });
+        if (r.ok) return showApp(t);
+        store(null);
+        showLogin('กรุณาเข้าสู่ระบบอีกครั้ง', true);
+      } catch (e) {
+        showLogin('เชื่อมต่อระบบไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่');
+      }
+    })();
+  </script>
+</body>
+</html>

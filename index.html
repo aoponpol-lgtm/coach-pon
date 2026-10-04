@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Coach Pon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#e4572e">
+  <meta name="theme-color" content="#f4f3f6">
   <!-- ไอคอน: iPhone/iPad -->
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,30 +14,32 @@
   <!-- ไอคอน: Chrome/Edge บนคอม และ Android -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&family=Kanit:ital,wght@1,700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; background: #f5f6f8; color: #1f2933;
-      font: 15px/1.55 'IBM Plex Sans Thai', -apple-system, 'Segoe UI', sans-serif; }
+    html, body { margin: 0; height: 100%; color: #2a2b31; font: 15px/1.55 'IBM Plex Sans Thai', -apple-system, 'Segoe UI', sans-serif;
+      background: radial-gradient(120% 70% at 100% 0%, #fde6ee 0%, rgba(253, 230, 238, 0) 60%), radial-gradient(90% 60% at 0% 100%, #fbe0ea 0%, rgba(251, 224, 234, 0) 55%), #f4f3f6; }
     #login { min-height: 100%; display: grid; place-items: center; padding: 24px 16px;
       padding-top: calc(24px + env(safe-area-inset-top)); }
-    .box { width: 100%; max-width: 360px; text-align: center; }
-    .logo { width: 88px; height: 88px; border-radius: 22px; margin: 0 auto 16px; display: block; }
-    h1 { font-size: 24px; margin: 0 0 4px; }
-    .muted { color: #6b7785; margin: 0 0 24px; }
+    .box { width: 100%; max-width: 380px; text-align: center; background: rgba(255, 255, 255, .8); border: 1px solid #ecebef;
+      border-radius: 28px; padding: 36px 24px 28px; box-shadow: 0 18px 48px rgba(214, 93, 137, .14); backdrop-filter: blur(8px); }
+    .logo { width: 92px; height: 92px; border-radius: 24px; margin: 0 auto 18px; display: block; box-shadow: 0 10px 26px rgba(214, 93, 137, .35); }
+    h1 { font: italic 700 30px/1.1 'Kanit', sans-serif; margin: 0 0 6px; letter-spacing: .3px; color: #2a2b31; }
+    h1 span { color: #d65d89; }
+    .muted { color: #8b8f99; margin: 0 0 26px; }
     #gbtn { display: flex; justify-content: center; min-height: 44px; }
-    #msg { margin-top: 18px; padding: 12px; border-radius: 10px; background: #fde8e8; color: #b91c1c; }
-    #msg.info { background: #eef0f3; color: #1f2933; }
-    #app { position: fixed; inset: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); background: #f5f6f8; }
+    #msg { margin-top: 18px; padding: 12px; border-radius: 14px; background: #fde7ec; color: #a8355a; }
+    #msg.info { background: #eff0f3; color: #2a2b31; }
+    #app { position: fixed; inset: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); background: #f4f3f6; }
     #app iframe { width: 100%; height: 100%; border: 0; display: block; }
-    .hint { margin-top: 28px; font-size: 13px; color: #6b7785; }
+    .hint { margin: 24px 0 0; font-size: 13px; color: #8b8f99; }
   </style>
 </head>
 <body>
   <div id="login" hidden>
     <div class="box">
       <img class="logo" src="icons/icon-192.png" alt="">
-      <h1>Coach Pon</h1>
+      <h1>Coach <span>Pon</span></h1>
       <p class="muted">ระบบติดตามการฝึกของลูกเทรน</p>
       <div id="gbtn"></div>
       <div id="msg" hidden></div>
@@ -93,7 +95,7 @@
         cancel_on_tap_outside: true,
       });
       google.accounts.id.renderButton($('gbtn'), {
-        theme: 'filled_blue', size: 'large', shape: 'pill', text: 'signin_with', locale: 'th', width: 280,
+        theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: 'th', width: 280,
       });
     }
 

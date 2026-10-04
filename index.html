@@ -4,35 +4,37 @@
   <meta charset="utf-8">
   <title>Coach Pon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4f3f6">
+  <meta name="theme-color" content="#000000">
   <!-- ไอคอน: iPhone/iPad -->
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Coach Pon">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <!-- ไอคอน: Chrome/Edge บนคอม และ Android -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&family=Kanit:ital,wght@1,700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; color: #2a2b31; font: 15px/1.55 'IBM Plex Sans Thai', -apple-system, 'Segoe UI', sans-serif;
-      background: radial-gradient(120% 70% at 100% 0%, #fde6ee 0%, rgba(253, 230, 238, 0) 60%), radial-gradient(90% 60% at 0% 100%, #fbe0ea 0%, rgba(251, 224, 234, 0) 55%), #f4f3f6; }
-    #login { min-height: 100%; display: grid; place-items: center; padding: 24px 16px;
+    html, body { margin: 0; height: 100%; color: #fff; background: #000; color-scheme: dark; font: 15px/1.55 'IBM Plex Sans Thai', -apple-system, 'Segoe UI', sans-serif; }
+    body::before { content: ''; position: fixed; right: -120px; top: -120px; width: 340px; height: 340px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 0, 128, .55) 0%, rgba(255, 0, 128, 0) 70%); }
+    body::after { content: ''; position: fixed; left: -80px; bottom: -80px; width: 220px; height: 220px; border-radius: 50%; border: 16px solid rgba(255, 0, 128, .22); }
+    #login { position: relative; z-index: 1; min-height: 100%; display: grid; place-items: center; padding: 24px 18px;
       padding-top: calc(24px + env(safe-area-inset-top)); }
-    .box { width: 100%; max-width: 380px; text-align: center; background: rgba(255, 255, 255, .8); border: 1px solid #ecebef;
-      border-radius: 28px; padding: 36px 24px 28px; box-shadow: 0 18px 48px rgba(214, 93, 137, .14); backdrop-filter: blur(8px); }
-    .logo { width: 92px; height: 92px; border-radius: 24px; margin: 0 auto 18px; display: block; box-shadow: 0 10px 26px rgba(214, 93, 137, .35); }
-    h1 { font: italic 700 30px/1.1 'Kanit', sans-serif; margin: 0 0 6px; letter-spacing: .3px; color: #2a2b31; }
-    h1 span { color: #d65d89; }
-    .muted { color: #8b8f99; margin: 0 0 26px; }
+    .box { width: 100%; max-width: 380px; text-align: center; background: rgba(255, 255, 255, .08); border-radius: 28px; padding: 38px 24px 30px;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .logo { width: 92px; height: 92px; border-radius: 24px; margin: 0 auto 18px; display: block; box-shadow: 0 0 0 4px rgba(255, 0, 128, .25); }
+    h1 { font: italic 700 34px/1.1 'Kanit', sans-serif; margin: 0 0 6px; letter-spacing: .3px; color: #fff; }
+    h1 span { color: #ff0080; }
+    .muted { color: rgba(217, 217, 217, .72); margin: 0 0 26px; }
     #gbtn { display: flex; justify-content: center; min-height: 44px; }
-    #msg { margin-top: 18px; padding: 12px; border-radius: 14px; background: #fde7ec; color: #a8355a; }
-    #msg.info { background: #eff0f3; color: #2a2b31; }
-    #app { position: fixed; inset: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); background: #f4f3f6; }
-    #app iframe { width: 100%; height: 100%; border: 0; display: block; }
-    .hint { margin: 24px 0 0; font-size: 13px; color: #8b8f99; }
+    #msg { margin-top: 18px; padding: 12px; border-radius: 14px; background: #ff0080; color: #fff; font-weight: 600; }
+    #msg.info { background: rgba(255, 255, 255, .12); color: #fff; font-weight: 400; }
+    #app { position: fixed; inset: 0; z-index: 2; padding-top: env(safe-area-inset-top); background: #000; }
+    #app iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
+    .hint { margin: 24px 0 0; font-size: 13px; color: rgba(217, 217, 217, .6); }
   </style>
 </head>
 <body>
@@ -95,7 +97,7 @@
         cancel_on_tap_outside: true,
       });
       google.accounts.id.renderButton($('gbtn'), {
-        theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: 'th', width: 280,
+        theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', locale: 'th', width: 280,
       });
     }
 

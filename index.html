@@ -2,162 +2,34 @@
 <html lang="th">
 <head>
   <meta charset="utf-8">
-  <title>Coach Pon</title>
+  <title>Coach Pon — Build your momentum</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="เริ่มต้นเป้าหมายของคุณกับครูพล: วิเคราะห์ BMI, BMR, TDEE แคลอรี่และสัดส่วนอาหารที่เหมาะกับคุณ ฟรี">
   <meta name="theme-color" content="#000000">
-  <!-- ไอคอน: iPhone/iPad -->
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Coach Pon">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <!-- ไอคอน: Chrome/Edge บนคอม และ Android -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&family=Kanit:ital,wght@1,700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; color: #fff; background: #000; color-scheme: dark; font: 15px/1.55 'IBM Plex Sans Thai', -apple-system, 'Segoe UI', sans-serif; }
-    body::before { content: ''; position: fixed; right: -120px; top: -120px; width: 340px; height: 340px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 0, 128, .55) 0%, rgba(255, 0, 128, 0) 70%); }
-    body::after { content: ''; position: fixed; left: -80px; bottom: -80px; width: 220px; height: 220px; border-radius: 50%; border: 16px solid rgba(255, 0, 128, .22); }
-    #login { position: relative; z-index: 1; min-height: 100%; display: grid; place-items: center; padding: 24px 18px;
-      padding-top: calc(24px + env(safe-area-inset-top)); }
-    .box { width: 100%; max-width: 380px; text-align: center; background: rgba(255, 255, 255, .08); border-radius: 28px; padding: 38px 24px 30px;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-    .logo { width: 92px; height: 92px; border-radius: 24px; margin: 0 auto 18px; display: block; box-shadow: 0 0 0 4px rgba(255, 0, 128, .25); }
-    h1 { font: italic 700 34px/1.1 'Kanit', sans-serif; margin: 0 0 6px; letter-spacing: .3px; color: #fff; }
-    h1 span { color: #ff0080; }
-    .muted { color: rgba(217, 217, 217, .72); margin: 0 0 26px; }
-    #gbtn { display: flex; justify-content: center; min-height: 44px; }
-    #msg { margin-top: 18px; padding: 12px; border-radius: 14px; background: #ff0080; color: #fff; font-weight: 600; }
-    #msg.info { background: rgba(255, 255, 255, .12); color: #fff; font-weight: 400; }
-    #app { position: fixed; inset: 0; z-index: 2; padding-top: env(safe-area-inset-top); background: #000; }
-    #app iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
-    .hint { margin: 24px 0 0; font-size: 13px; color: rgba(217, 217, 217, .6); }
-  </style>
+  <meta property="og:title" content="Coach Pon — Build your momentum">
+  <meta property="og:description" content="วิเคราะห์ร่างกายและแคลอรี่ที่เหมาะกับคุณ ฟรี กับครูพล">
+  <meta property="og:image" content="img/bg.jpg">
+  <link rel="preload" href="img/bg.webp" as="image" type="image/webp">
+  <link rel="preload" href="fonts/Inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Kanit:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="start.css?v=1">
 </head>
 <body>
-  <div id="login" hidden>
-    <div class="box">
-      <img class="logo" src="icons/icon-192.png" alt="">
-      <h1>Coach <span>Pon</span></h1>
-      <p class="muted">ระบบติดตามการฝึกของลูกเทรน</p>
-      <div id="gbtn"></div>
-      <div id="msg" hidden></div>
-      <p class="hint" id="hint"></p>
-    </div>
-  </div>
+  <div class="bg" id="bg"></div>
+  <main id="start"></main>
   <div id="app" hidden></div>
 
   <script src="config.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async onload="initGoogle()"></script>
-  <script>
-    const CFG = window.CP_CONFIG;
-    const KEY = 'cp_session';
-    const $ = (id) => document.getElementById(id);
-
-    function store(v) {
-      try { v === null ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, v); } catch (e) {}
-    }
-    function stored() {
-      try { return localStorage.getItem(KEY); } catch (e) { return null; }
-    }
-
-    // ส่งคำขอไปหลังบ้าน (Content-Type text/plain เพื่อไม่ให้ติด CORS preflight)
-    async function api(body) {
-      const res = await fetch(CFG.EXEC_URL, { method: 'POST', body: JSON.stringify(body) });
-      return res.json();
-    }
-
-    function showMsg(text, info) {
-      const m = $('msg');
-      m.textContent = text; m.hidden = !text; m.className = info ? 'info' : '';
-    }
-
-    function showLogin(message, info) {
-      $('app').hidden = true; $('app').innerHTML = '';
-      $('login').hidden = false;
-      showMsg(message || '', info);
-    }
-
-    function showApp(token) {
-      $('login').hidden = true;
-      const f = document.createElement('iframe');
-      f.src = CFG.EXEC_URL + '?s=' + encodeURIComponent(token);
-      f.title = 'Coach Pon';
-      $('app').innerHTML = ''; $('app').appendChild(f); $('app').hidden = false;
-    }
-
-    function initGoogle() {
-      google.accounts.id.initialize({
-        client_id: CFG.CLIENT_ID,
-        callback: onCredential,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      google.accounts.id.renderButton($('gbtn'), {
-        theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', locale: 'th', width: 280,
-      });
-    }
-
-    async function onCredential(resp) {
-      showMsg('กำลังตรวจสอบสิทธิ์…', true);
-      try {
-        const r = await api({ action: 'login', idToken: resp.credential });
-        if (r.ok) { store(r.token); showMsg(''); showApp(r.token); return; }
-        if (r.error === 'not_allowed') {
-          showMsg('บัญชี ' + r.email + ' ยังไม่มีสิทธิ์ใช้งาน กรุณาแจ้งโค้ชให้เพิ่มอีเมลนี้');
-        } else {
-          showMsg('เข้าสู่ระบบไม่สำเร็จ (' + r.error + ') ลองใหม่อีกครั้ง');
-        }
-      } catch (e) {
-        showMsg('เชื่อมต่อระบบไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่');
-      }
-    }
-
-    // ข้อความจากหน้าแอปที่ฝังอยู่ (Apps Script)
-    window.addEventListener('message', async (ev) => {
-      let host = '';
-      try { host = new URL(ev.origin).hostname; } catch (e) { return; }
-      if (!(host.endsWith('.googleusercontent.com') || host === 'script.google.com')) return;
-      const type = ev.data && ev.data.type;
-      if (type === 'cp-auth-expired') {
-        store(null);
-        showLogin('การเข้าสู่ระบบหมดอายุ หรือถูกปิดสิทธิ์ กรุณาเข้าสู่ระบบใหม่', true);
-      } else if (type === 'cp-logout') {
-        const t = stored();
-        store(null);
-        try { google.accounts.id.disableAutoSelect(); } catch (e) {}
-        showLogin('ออกจากระบบแล้ว', true);
-        if (t) api({ action: 'logout', token: t }).catch(() => {});
-      }
-    });
-
-    // คำแนะนำติดตั้งไอคอนตามอุปกรณ์
-    (function hint() {
-      const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-      if (standalone) return;
-      const ua = navigator.userAgent;
-      const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      $('hint').textContent = ios
-        ? 'เพิ่มไอคอนบนหน้าจอ: กดปุ่มแชร์ (□↑) → "เพิ่มไปยังหน้าจอโฮม"'
-        : 'เพิ่มไอคอนบนคอม: Chrome เมนู ⋮ → "แคสต์ บันทึก และแชร์" → "ติดตั้งหน้าเว็บเป็นแอป"';
-    })();
-
-    // เริ่มต้น: ถ้ามี session เดิมให้ตรวจก่อน
-    (async function start() {
-      const t = stored();
-      if (!t) return showLogin();
-      try {
-        const r = await api({ action: 'check', token: t });
-        if (r.ok) return showApp(t);
-        store(null);
-        showLogin('กรุณาเข้าสู่ระบบอีกครั้ง', true);
-      } catch (e) {
-        showLogin('เชื่อมต่อระบบไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่');
-      }
-    })();
-  </script>
+  <script src="calc.js?v=1"></script>
+  <script src="start.js?v=1"></script>
+  <script src="https://accounts.google.com/gsi/client" async onload="cpInitGoogle()"></script>
 </body>
 </html>

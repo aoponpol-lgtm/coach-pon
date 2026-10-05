@@ -21,7 +21,16 @@
   }
 
   /* ---------- ลำดับหน้า ---------- */
-  const FLOW = ['name', 'sexbirth', 'body', 'goal', 'goalweight', 'activity', 'calories', 'macro', 'summary', 'extra', 'account'];
+  const FLOW = ['name', 'sexbirth', 'body', 'goal', 'goalweight', 'activity', 'calories', 'macro', 'summary', 'extra', 'health', 'account'];
+  const PARQ = [
+    'แพทย์เคยบอกว่าคุณมีโรคหัวใจ หรือความดันโลหิตสูง',
+    'เคยเจ็บหน้าอกขณะพัก ทำกิจวัตร หรือออกกำลังกาย',
+    'ใน 12 เดือนที่ผ่านมา เคยเวียนศีรษะจนเสียการทรงตัว หรือหมดสติ',
+    'เคยได้รับการวินิจฉัยโรคเรื้อรังอื่น',
+    'ตอนนี้ใช้ยาที่แพทย์สั่งเพื่อรักษาโรคเรื้อรัง',
+    'ใน 12 เดือนที่ผ่านมา มีปัญหากระดูก ข้อต่อ กล้ามเนื้อ หรือเอ็น ที่อาจแย่ลงถ้าออกกำลังกาย',
+    'แพทย์เคยบอกว่าควรออกกำลังกายภายใต้การดูแลทางการแพทย์เท่านั้น',
+  ];
   let cur = 'welcome';
   let msg = '';
   const skip = (s) => s === 'goalweight' && D.goal === 'maintain';
@@ -182,7 +191,21 @@
               <p class="small" style="margin:8px 0 0">${kgw > 0 ? '+' : ''}${kgw} กก./สัปดาห์ · ผลจริงขึ้นกับการนอน ความเครียด และความสม่ำเสมอ ครูพลช่วยปรับให้ได้</p>`
             : `<p style="margin:0">${D.goal === 'maintain' ? 'รักษาน้ำหนัก ' + kg + ' กก. และสร้างความแข็งแรง' : 'ตั้งน้ำหนักเป้าหมายเพื่อดู Timeline'}</p>`}
         </div>
+        <button class="btn outline" id="shareplan" style="margin-bottom:8px">📸 แชร์แผนนี้ลง IG Story</button>
         <button class="btn" id="nx">ไปต่อ</button></div>`;
+    },
+    health() {
+      const P = D.parq || [];
+      const yes = P.filter((x) => x === 'Y').length;
+      return `<div class="screen top">
+        <h2>Health check</h2><p class="sub">PAR-Q+ 7 ข้อ เพื่อความปลอดภัยก่อนเริ่มฝึก (ใช้เวลา 30 วินาที)</p>
+        ${PARQ.map((q, i) => `<div class="glass" style="padding:14px 16px;margin-bottom:10px">
+          <div style="font-size:15px;margin-bottom:10px">${i + 1}. ${esc(q)}</div>
+          <div class="chips" style="margin:0"><button class="chip ${P[i] === 'N' ? 'on' : ''}" data-pq="${i}" data-v="N">ไม่ใช่</button>
+          <button class="chip ${P[i] === 'Y' ? 'on' : ''}" data-pq="${i}" data-v="Y">ใช่</button></div></div>`).join('')}
+        ${yes ? `<input id="f1" placeholder="รายละเอียดสั้น ๆ เช่น โรค/ยา/ตำแหน่งที่เจ็บ" value="${esc(D.parq_detail)}">
+          <p class="small" style="margin-top:-4px">ไม่เป็นไร! ครูพลจะดูข้อมูลนี้ก่อนให้คุณเริ่มโปรแกรม เพื่อให้ฝึกได้ปลอดภัย</p>` : ''}
+        <button class="btn" id="nx" ${P.filter(Boolean).length === PARQ.length ? '' : 'disabled'}>Next</button></div>`;
     },
     extra() {
       const I = D.interest || [];
@@ -316,7 +339,22 @@
       document.querySelectorAll('[data-macro]').forEach((b) => (b.onclick = () => { D.macro = b.dataset.macro; save(); render(); }));
       $('nx').onclick = () => { D.macro = D.macro || C.defaultMacro(D.goal); save(); next(); };
     },
-    summary() { $('nx').onclick = next; },
+    summary() {
+      $('nx').onclick = next;
+      $('shareplan').onclick = () => openShare(['plan', 'profile', 'sticker']);
+    },
+    health() {
+      document.querySelectorAll('[data-pq]').forEach((b) => (b.onclick = () => {
+        D.parq = (D.parq || []).slice();
+        D.parq[Number(b.dataset.pq)] = b.dataset.v;
+        if ($('f1')) D.parq_detail = val('f1');
+        save(); render();
+      }));
+      $('nx').onclick = () => {
+        if ($('f1')) D.parq_detail = val('f1');
+        save(); next();
+      };
+    },
     extra() {
       document.querySelectorAll('[data-int]').forEach((b) => (b.onclick = () => {
         const I = D.interest || [];
@@ -396,6 +434,7 @@
       minutes: D.minutes, days: D.days, lifestyle: D.lifestyle || 'sit', target_kcal: D.kcal, macro: D.macro || C.defaultMacro(D.goal),
       interest: D.interest || [], experience: D.experience, source: D.source, line_id: D.line_id, phone: D.phone,
       consent: !!D.consent, marketing: !!D.marketing,
+      parq: D.parq || [], parq_detail: D.parq_detail || '', ref: D.ref || '',
     };
   }
 
@@ -410,6 +449,24 @@
       if (r.error === 'exists') return go('signin', r.msg);
       go('account', r.msg || 'สมัครไม่สำเร็จ');
     } catch (e) { go('account', 'เชื่อมต่อระบบไม่ได้ ลองใหม่อีกครั้ง'); }
+  }
+
+  /* ---------- แชร์การ์ด ---------- */
+  function planData() {
+    const p = prof();
+    const kcal = Number(D.kcal), kg = Number(D.weight_kg);
+    const pick = pickedOption(p, C.calorieOptions(p));
+    const kgw = pick ? pick.kgPerWeek : Math.round(((kcal - p.tdee) * 7 / 7700) * 100) / 100;
+    const g = C.macroGrams(kcal, D.macro || C.defaultMacro(D.goal), kg);
+    const goalKg = D.goal === 'maintain' ? null : Number(D.goal_weight) || null;
+    return {
+      name: D.nickname || '', goal: D.goal, kcal: kcal, protein: g.protein_g, carbs: g.carbs_g, fat: g.fat_g,
+      start_weight: kg, goal_weight: goalKg, weeks: goalKg ? C.timeline(kg, goalKg, kgw) : null,
+      bmi: p.bmi, bmiClass: p.bmiClass.th, bmr: p.bmr, tdee: p.tdee, shareUrl: location.origin + location.pathname,
+    };
+  }
+  function openShare(kinds) {
+    if (window.CPShare) window.CPShare.open(planData(), kinds);
   }
 
   /* ---------- Google ---------- */
@@ -466,6 +523,14 @@
     try { host = new URL(ev.origin).hostname; } catch (e) { return; }
     if (!(host.endsWith('.googleusercontent.com') || host === 'script.google.com')) return;
     const type = ev.data && ev.data.type;
+    if (type === 'cp-share' && window.CPShare && ev.data.data) {
+      window.CPShare.open(ev.data.data, ev.data.kinds);
+      return;
+    }
+    if (type === 'cp-booking' && /^https:\/\/calendar\.(app\.google|google\.com)\//.test(String(ev.data.url || ''))) {
+      window.open(ev.data.url, '_blank', 'noopener');
+      return;
+    }
     if (type === 'cp-auth-expired') {
       ls.set(KEY, null);
       showStart('signin', 'การเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบใหม่');
@@ -487,6 +552,9 @@
 
   /* ---------- เริ่ม ---------- */
   (async function boot() {
+    // ลิงก์ชวนเพื่อน ?ref=M001 → จำไว้ใช้ตอนสมัคร
+    const ref = new URLSearchParams(location.search).get('ref');
+    if (ref && /^[CM]\d{3,}$/i.test(ref)) { D.ref = ref.toUpperCase(); save(); }
     const t = ls.get(KEY);
     if (!t) {
       // มีข้อมูลค้างจากรอบก่อน → กลับไปหน้าที่ยังไม่ครบ

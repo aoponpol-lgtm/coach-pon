@@ -241,15 +241,26 @@
         </div></div>`;
     },
     signin() {
-      return `<div class="screen">
-        <h2>Welcome back</h2><p class="sub">เข้าสู่ระบบเพื่อดูแผนและบันทึกผล</p>
-        ${msg ? `<p class="${/สำเร็จ|ส่งแล้ว|ออกจากระบบ/.test(msg) ? 'ok' : 'err'}">${esc(msg)}</p>` : ''}
-        <div id="gbtn-in"></div>
-        <div class="divider">หรือใช้อีเมล</div>
-        <input id="em" type="email" inputmode="email" autocomplete="email" placeholder="อีเมล" value="${esc(D.email)}">
-        <input id="pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน">
-        <button class="btn" id="login">Sign In</button>
-        <p class="foot"><button class="link" data-go="reset">ลืมรหัสผ่าน?</button> · ยังไม่มีบัญชี? <button class="link" data-go="name">Sign up</button></p></div>`;
+      const ok = /สำเร็จ|ส่งแล้ว|ออกจากระบบ/.test(msg);
+      return `<div class="screen auth">
+        <div class="auth-head">
+          <img src="img/logo-pink.png" class="auth-logo" alt="">
+          <h1 class="auth-title">Welcome<br><span>back</span></h1>
+          <p class="auth-sub">เข้าสู่ระบบเพื่อดูแผน ฝึก และบันทึกผลกับครูพล</p>
+        </div>
+        ${msg ? `<p class="${ok ? 'ok' : 'err'}">${esc(msg)}</p>` : ''}
+        <div class="glass auth-card">
+          ${D.email ? `<p class="auth-last">👋 ครั้งก่อนใช้ <b>${esc(D.email)}</b></p>` : ''}
+          <div class="gwrap"><div id="gbtn-in"><div class="gload">กำลังโหลดปุ่ม Google…</div></div></div>
+          <p class="auth-note">🔒 แนะนำ · ปลอดภัย ไม่ต้องจำรหัสผ่าน</p>
+          <div class="divider">หรือใช้อีเมล</div>
+          <input id="em" type="email" inputmode="email" autocomplete="email" placeholder="อีเมล" value="${esc(D.email)}">
+          <div class="pwbox"><input id="pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน">
+            <button class="eye" type="button" id="eye" aria-label="แสดงรหัสผ่าน">แสดง</button></div>
+          <button class="btn" id="login">Sign In</button>
+          <p class="auth-forgot"><button class="link" data-go="reset">ลืมรหัสผ่าน?</button></p>
+        </div>
+        <p class="foot">ยังไม่มีบัญชี? <button class="link" data-go="name">สมัครฟรี</button></p></div>`;
     },
     reset() {
       return `<div class="screen">
@@ -391,7 +402,14 @@
       };
     },
     signin() {
+      $('eye').onclick = () => {
+        const show = $('pw').type === 'password';
+        $('pw').type = show ? 'text' : 'password';
+        $('eye').textContent = show ? 'ซ่อน' : 'แสดง';
+      };
+      $('pw').onkeydown = (e) => { if (e.key === 'Enter') $('login').click(); };
       $('login').onclick = async () => {
+        if (!val('em') || !$('pw').value) return go('signin', 'กรอกอีเมลและรหัสผ่าน');
         D.email = val('em'); save();
         busy('login', 'กำลังเข้าสู่ระบบ…');
         try {
@@ -478,8 +496,19 @@
     if (cur === 'signin') renderGoogle('gbtn-in', 'signin_with');
   };
   function renderGoogle(id, text) {
-    if (!gReady || !$(id)) return;
-    google.accounts.id.renderButton($(id), { theme: 'filled_black', size: 'large', shape: 'pill', text: text, locale: 'th', width: 300 });
+    const el = $(id);
+    if (!gReady || !el) return;
+    // ปุ่มทางการของ Google แบบขาว กว้างเต็มการ์ด (Google รองรับกว้าง 200–400 px)
+    const w = Math.max(200, Math.min(400, Math.floor((el.parentNode.clientWidth || 320))));
+    el.innerHTML = '';
+    google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', shape: 'pill', text: text, locale: 'th', width: w, logo_alignment: 'center' });
+  }
+  /** หน้ารอระหว่างตรวจบัญชี Google (เดิมจอนิ่งจนผู้ใช้กดซ้ำ) */
+  function authWait(on, text) {
+    let el = $('authwait');
+    if (!on) { if (el) el.remove(); return; }
+    if (!el) { el = document.createElement('div'); el.id = 'authwait'; el.className = 'authwait'; document.body.appendChild(el); }
+    el.innerHTML = `<div><img src="img/logo-pink.png" alt=""><b>${esc(text || 'กำลังเข้าสู่ระบบ…')}</b><small>อีกสักครู่</small></div>`;
   }
   async function onGoogle(resp) {
     if (cur === 'account') {
@@ -487,12 +516,14 @@
       if (!D.consent) return go('account', 'กรุณาติ๊กยินยอมการเก็บข้อมูลก่อน แล้วกดปุ่ม Google อีกครั้ง');
       return finishSignup({ method: 'google', idToken: resp.credential });
     }
+    authWait(true, 'กำลังเข้าสู่ระบบด้วย Google…');
     try {
       const r = await api({ action: 'login', idToken: resp.credential });
+      authWait(false);
       if (r.ok) return enter(r.token);
       if (r.error === 'not_registered') return go('name', '');
       go('signin', r.error === 'not_allowed' ? 'บัญชีนี้ถูกปิดการใช้งาน กรุณาติดต่อครูพล' : 'เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง');
-    } catch (e) { go('signin', 'เชื่อมต่อระบบไม่ได้'); }
+    } catch (e) { authWait(false); go('signin', 'เชื่อมต่อระบบไม่ได้'); }
   }
 
   /* ---------- เข้าแอป ---------- */

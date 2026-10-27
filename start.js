@@ -33,12 +33,15 @@
   ];
   let cur = 'welcome';
   let msg = '';
+  // รหัสยืนยัน/รหัสผ่านที่พิมพ์ไว้ เติมกลับเมื่อสมัครไม่ผ่าน (เก็บในหน่วยความจำเท่านั้น ไม่ลง localStorage)
+  let HOLD = null;
   const skip = (s) => s === 'goalweight' && D.goal === 'maintain';
   const steps = () => FLOW.filter((s) => !skip(s));
 
   function go(s, message) {
     cur = s;
     msg = message || '';
+    if (s !== 'account') HOLD = null;
     render();
     window.scrollTo(0, 0);
   }
@@ -392,8 +395,13 @@
           setTimeout(() => $('code') && $('code').focus(), 50);
         } catch (e) { go('account', 'เชื่อมต่อระบบไม่ได้ ลองใหม่อีกครั้ง'); }
       };
+      if (HOLD) {
+        ['code', 'pw1', 'pw2'].forEach((k) => ($(k).value = HOLD[k] || ''));
+        HOLD = null;
+      }
       if ($('signup')) $('signup').onclick = async () => {
         keep();
+        HOLD = { code: val('code'), pw1: val('pw1'), pw2: val('pw2') };
         if (!D.consent) return go('account', 'กรุณาติ๊กยินยอมการเก็บข้อมูลก่อน');
         if (val('pw1') !== val('pw2')) return go('account', 'รหัสผ่านทั้ง 2 ช่องไม่ตรงกัน');
         if (val('pw1').length < 8 || !/[a-z]/i.test(val('pw1')) || !/\d/.test(val('pw1'))) return go('account', 'รหัสผ่านต้องยาว 8 ตัวขึ้นไป มีทั้งตัวอักษรและตัวเลข');
@@ -588,7 +596,6 @@
     if (ref && /^[CM]\d{3,}$/i.test(ref)) { D.ref = ref.toUpperCase(); save(); }
     const t = ls.get(KEY);
     if (!t) {
-      // มีข้อมูลค้างจากรอบก่อน → กลับไปหน้าที่ยังไม่ครบ
       return go(location.hash === '#signin' ? 'signin' : 'welcome');
     }
     $('start').innerHTML = '<div class="screen"><p class="center small">กำลังโหลด…</p></div>';

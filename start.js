@@ -38,10 +38,33 @@
   const skip = (s) => s === 'goalweight' && D.goal === 'maintain';
   const steps = () => FLOW.filter((s) => !skip(s));
 
+  /** หน้าแรกที่ข้อมูลยังไม่ครบ (หน้าสรุป/ข้อมูลเสริมไม่มีช่องบังคับ) ใช้กับแบบร่างที่ยังไม่มี D.last */
+  const DONE = {
+    name: () => D.first_name && D.nickname,
+    sexbirth: () => D.sex && D.birth_date,
+    body: () => D.height_cm && D.weight_kg,
+    goal: () => D.goal,
+    goalweight: () => D.goal_weight,
+    activity: () => D.lifestyle,
+    calories: () => D.kcal,
+    macro: () => D.macro,
+    health: () => (D.parq || []).filter(Boolean).length === PARQ.length,
+  };
+  /** หน้าที่จะพากลับไปทำต่อ: หน้าล่าสุดที่เปิดไว้ แต่ไม่เลยหน้าแรกที่ยังกรอกไม่ครบ */
+  function resumeStep() {
+    const list = steps();
+    const gap = list.filter((s) => DONE[s] && !DONE[s]())[0];
+    const last = list.indexOf(D.last) >= 0 ? D.last : list[list.length - 1];
+    if (!gap) return last;
+    return list.indexOf(gap) < list.indexOf(last) ? gap : last;
+  }
+  const hasDraft = () => !!D.first_name;
+
   function go(s, message) {
     cur = s;
     msg = message || '';
     if (s !== 'account') HOLD = null;
+    if (FLOW.indexOf(s) >= 0 && D.last !== s) { D.last = s; save(); }
     render();
     window.scrollTo(0, 0);
   }
@@ -75,7 +98,11 @@
         <h1 class="hero">Build your momentum</h1>
         <p class="center th">เริ่มต้นเป้าหมายของคุณกับครูพล</p>
         <p class="center small" style="margin:0 0 20px">วิเคราะห์ร่างกาย · แคลอรี่ที่เหมาะกับคุณ · แผนเริ่มต้นฟรี</p>
-        <button class="btn" data-go="name">Sign up</button>
+        ${hasDraft() ? (() => {
+          const list = steps(), s = resumeStep();
+          return `<button class="btn" id="resume">ทำต่อจากที่ค้างไว้<small style="display:block;font-size:12px;font-weight:400;opacity:.85">${esc(D.nickname || D.first_name)} · ขั้นที่ ${list.indexOf(s) + 1}/${list.length}</small></button>
+          <p class="foot" style="margin-top:6px"><button class="link" id="restart">เริ่มสมัครใหม่</button></p>`;
+        })() : '<button class="btn" data-go="name">Sign up</button>'}
         <p class="foot">มีบัญชีแล้ว? <button class="link" data-go="signin">Sign In</button></p>
         <p class="center small" id="hint" style="margin-top:14px"></p>
       </div>`;
@@ -317,6 +344,16 @@
 
   const val = (id) => ($(id) ? $(id).value.trim() : '');
   const bind = {
+    welcome() {
+      if (!hasDraft()) return;
+      $('resume').onclick = () => go(resumeStep());
+      $('restart').onclick = () => {
+        if (!confirm('ล้างคำตอบที่กรอกไว้ แล้วเริ่มใหม่?')) return;
+        D = D.ref ? { ref: D.ref } : {};
+        save();
+        go('name');
+      };
+    },
     name() { nextWhen(() => val('f1') && val('f2'), () => { D.first_name = val('f1'); D.nickname = val('f2'); }); },
     sexbirth() {
       nextWhen(() => {
@@ -596,6 +633,8 @@
     if (ref && /^[CM]\d{3,}$/i.test(ref)) { D.ref = ref.toUpperCase(); save(); }
     const t = ls.get(KEY);
     if (!t) {
+      // ปลุกหลังบ้านไว้ก่อนระหว่างผู้ใช้กรอกข้อมูล พอกดสมัคร/ล็อกอินจะตอบเร็วขึ้น
+      api({ action: 'ping' }).catch(() => {});
       return go(location.hash === '#signin' ? 'signin' : 'welcome');
     }
     $('start').innerHTML = '<div class="screen"><p class="center small">กำลังโหลด…</p></div>';

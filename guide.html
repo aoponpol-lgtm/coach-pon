@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Coach Pon Guide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="วิธีใช้แอป Coach Pon: Kickstart 7 วัน, ตารางฝึก, Meal tracker + AI, ติดตามผล และแชร์การ์ด">
+  <meta name="description" content="วิธีใช้แอป Coach Pon: โปรแกรมฝึก ตัวจับเวลาเสียงครูพล ผลวัดร่างกาย Before / After และอีเมลเตือนฝึก">
   <meta name="theme-color" content="#d9d9d9">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,62 +77,48 @@
     const G_SITE = 'aoponpol-lgtm.github.io/coach-pon';
     const gPhone = (inner) => `<div class="g-phone">${inner}</div>`;
     const GUIDE = [
-      { k: 'Coach Pon App · Guide', h: 'Everything<br>you <span>need</span>', p: 'แอปเดียวจบ ฝึก กิน ติดตามผล และคุยกับครูพล ออกแบบให้ใช้ง่ายบนมือถือ',
+      { k: 'Coach Pon App · Guide', h: 'Train<br>with <span>Kru Pon</span>', p: 'โปรแกรมของคุณ ตัวจับเวลา และผลวัดร่างกาย อยู่ในแอปเดียว',
         v: gPhone(`<div class="gp"><small>สวัสดี 👋</small><b>WEEK <span>3</span></b><div class="gbar"><i style="width:60%"></i></div></div>
-          <div class="gp"><small>วันนี้กินไปแล้ว</small><b>1,155 <span style="font-size:11px">/ 1,600</span></b><div class="gbar"><i style="width:72%"></i></div></div>
+          <div class="gp"><small>วันนี้ · Lower body</small><b style="font-size:14px">6 ท่า · 45 นาที</b></div>
           <div class="gp"><small>🔥 ติดต่อกัน 6 ครั้ง</small></div>`),
         list: ['ปัดซ้ายเพื่อดูวิธีใช้ทีละขั้น', 'เปิดคู่มือนี้ได้ทุกเมื่อจากวงกลม <b>วิธีใช้</b> บนหน้าแรก'] },
-      { k: 'What\'s inside', h: 'All in<br>one <span>place</span>', p: 'ทุกอย่างที่ช่วยให้คุณไปถึงเป้าหมาย',
+      { k: 'What\'s inside', h: 'All in<br>one <span>place</span>', p: 'ทุกอย่างที่ช่วยให้คุณฝึกตามแผนได้จริง',
         v: `<div class="g-grid">
-          <div class="g-tile"><i>🔥</i><b>Kickstart</b><small>7 วันเริ่มต้น ทำที่บ้านได้</small></div>
-          <div class="g-tile"><i>🏋️</i><b>Workout</b><small>การ์ดวันฝึก + ตัวจับเวลา</small></div>
-          <div class="g-tile"><i>🍽</i><b>Meal</b><small>นับแคลอรี่ด้วย AI จากรูป</small></div>
-          <div class="g-tile"><i>📈</i><b>Progress</b><small>น้ำหนัก สถิติ เหรียญ</small></div>
-          <div class="g-tile" style="grid-column:1/-1"><i>💬</i><b>Coach</b><small>ครูพลดูข้อมูลของคุณและปรับแผนให้</small></div></div>` },
-      { k: 'Getting started', h: 'How to<br><span>start</span>', p: 'เริ่มได้ใน 3 ขั้นตอน',
+          <div class="g-tile"><i>🏋️</i><b>Program</b><small>วันฝึก ท่า เซต ครั้ง จากครูพล</small></div>
+          <div class="g-tile"><i>⏱</i><b>Timer</b><small>จับเวลาพร้อมเสียงครูพล</small></div>
+          <div class="g-tile"><i>📊</i><b>Before / After</b><small>ผลวัดร่างกายก่อน-หลัง</small></div>
+          <div class="g-tile"><i>✉️</i><b>Reminder</b><small>อีเมลเตือนก่อนวันฝึก</small></div></div>` },
+      { k: 'Getting started', h: 'How to<br><span>start</span>', p: 'ครูพลเปิดบัญชีให้ คุณแค่เข้าสู่ระบบ',
         v: `<div class="g-steps">
           <div class="g-step"><div><b>เปิดเว็บ</b><small>${G_SITE}</small></div></div>
-          <div class="g-step"><div><b>Sign up</b><small>กรอกข้อมูลร่างกายและเป้าหมาย ระบบคำนวณแผนให้ทันที</small></div></div>
-          <div class="g-step"><div><b>Sign in</b><small>ด้วย Google หรืออีเมล + รหัสผ่าน ครั้งต่อไปเข้าได้เลย</small></div></div></div>` },
+          <div class="g-step"><div><b>Sign in</b><small>ด้วย Google (อีเมลที่ให้ครูพลไว้) หรืออีเมล + รหัสผ่าน</small></div></div>
+          <div class="g-step"><div><b>เข้าได้เลยครั้งต่อไป</b><small>ระบบจำการเข้าสู่ระบบไว้ 30 วัน</small></div></div></div>` },
       { k: 'Install', h: 'Add to<br>home <span>screen</span>', p: 'ใช้เหมือนแอปจริง เปิดเร็ว ไม่ต้องค้นหาเว็บ',
         v: `<div class="g-steps">
           <div class="g-step"><div><b>iPhone (Safari)</b><small>กดปุ่มแชร์ ⬆︎ → "เพิ่มไปยังหน้าจอโฮม" → เพิ่ม</small></div></div>
           <div class="g-step"><div><b>Android (Chrome)</b><small>กด ⋮ มุมขวาบน → "เพิ่มลงในหน้าจอหลัก"</small></div></div>
           <div class="g-step"><div><b>เปิดจากไอคอน Coach Pon</b><small>ระบบจำการเข้าสู่ระบบไว้ 30 วัน</small></div></div></div>` },
-      { k: 'Your plan', h: 'Know your<br><span>numbers</span>', p: 'แผนแคลอรี่และสารอาหารที่คำนวณจากร่างกายของคุณ',
-        v: gPhone(`<div class="gp"><small>My plan</small><b>1,600 <span style="font-size:11px">kcal/วัน</span></b></div>
-          <div class="gp">โปรตีน <span class="pk">110g</span><div class="gbar"><i style="width:80%"></i></div>คาร์บ 170g<div class="gbar"><i style="width:60%;background:#fff"></i></div>ไขมัน 45g<div class="gbar"><i style="width:40%"></i></div></div>`),
-        list: ['<b>BMR</b> พลังงานที่ร่างกายใช้ขณะพัก', '<b>TDEE</b> พลังงานที่ใช้ทั้งวันรวมกิจกรรม', 'แผนนี้ปลอดภัย ไม่ต่ำกว่า BMR · วัด InBody กับครูพลจะแม่นขึ้น'] },
-      { k: 'Free program', h: '7-Day<br><span>Kickstart</span>', p: 'วันละ 20–30 นาที ไม่ต้องมีอุปกรณ์ เลือกระดับ "เพิ่งเริ่ม" หรือ "มีพื้นฐาน"',
-        v: gPhone(`<div class="gp"><small>7-Day Kickstart</small><b>DAY <span>4</span></b></div>
-          <div class="gks"><span class="on">✓</span><span class="on">✓</span><span class="on">✓</span><span>4</span><span>5</span><span>6</span><span>7</span></div>`),
-        list: ['กดวันนั้น → ดูท่า วิธีทำ → กด <b>จบการฝึก</b>', 'ทำครบ 7/7 รับการ์ดแชร์พิเศษ และสิทธิ์คุยกับครูพล'] },
       { k: 'Training', h: 'Workout<br>+ <span>timer</span>', p: 'ทุกวันฝึกมีท่า เซต ครั้ง และเวลาพัก พร้อมคำอธิบาย',
         v: gPhone(`<div class="gp"><small>A · ต้องทำ</small><b style="font-size:14px">Hip Thrust</b>3 × 10 · RPE 7 <span class="pk">⏱ 90 วิ</span></div>
           <div class="gp" style="text-align:center"><b>01:30</b><small>พักก่อน 😮‍💨</small></div>`),
-        list: ['กด <b>⏱</b> ข้างท่าเพื่อจับเวลาพักเต็มจอ', 'มีเสียงครูพลบอก "หมดเวลาพักแล้ว" (เปิดเสียงเครื่องไว้)', 'กรอกน้ำหนัก/ครั้งที่ทำได้ โค้ชจะเห็นและปรับโปรแกรมให้'] },
-      { k: 'Nutrition', h: 'Meal<br><span>tracker</span>', p: 'ถ่ายรูปอาหาร AI ช่วยประเมินแคลอรี่และสารอาหาร',
-        v: gPhone(`<div class="gimg"></div><div class="gp" style="margin-top:6px"><small>✨ AI Scan</small><b style="font-size:14px">ข้าวกะเพราไก่ไข่ดาว</b>650 kcal · P 32 · C 70 · F 26</div>`),
-        list: ['แท็บ <b>อาหาร</b> → <b>📷 AI Scan</b> → ตรวจแก้ตัวเลข → บันทึก', 'ดูสรุป วันนี้ / สัปดาห์นี้ / เดือนนี้ แตะวันไหนก็เห็นมื้อของวันนั้น', 'ไม่อยากถ่ายรูป กด <b>＋ เพิ่มมื้อ</b> กรอกเองได้'] },
-      { k: 'Progress', h: 'Track your<br><span>progress</span>', p: 'เห็นความเปลี่ยนแปลงชัดเจน ทุกสัปดาห์',
-        v: gPhone(`<div class="gp"><small>⚖️ น้ำหนัก</small><svg viewBox="0 0 120 40" style="width:100%"><polyline points="2,8 22,12 42,15 62,20 82,24 102,27 118,30" fill="none" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/></svg></div>
-          <div class="gp"><small>🏅 เหรียญ 5 · 10 · 25</small></div>`),
-        list: ['บันทึกน้ำหนักสัปดาห์ละ 1–2 ครั้ง ตอนเช้าก่อนกินอาหาร', 'ฝึกสะสมครบ 5 / 10 / 25 / 50 / 100 ครั้ง รับเหรียญ'] },
-      { k: 'Share', h: 'Share &<br><span>invite</span>', p: 'สร้างการ์ด IG Story สวย ๆ จากแผนและความสำเร็จของคุณ',
-        v: gPhone(`<div class="gp" style="text-align:center;padding:14px 8px"><b>7<span>/7</span></b><small>KICKSTART COMPLETE</small><div style="width:38px;height:38px;margin:8px auto 0;background:repeating-linear-gradient(90deg,#fff 0 3px,#000 3px 6px);border-radius:4px"></div></div>`),
-        list: ['กด <b>📸 แชร์</b> → เลือกการ์ด → แชร์ลง IG Story', 'การ์ดมี QR ให้เพื่อนสแกนสมัครได้ทันที'] },
-      { k: 'Members only', h: 'Coach Pon<br><span>club</span>', p: 'พื้นที่เฉพาะลูกเทรนของครูพล',
-        v: `<div class="g-grid"><div class="g-tile"><i>📅</i><b>12 weeks</b><small>ตารางฝึกระยะยาวในปฏิทิน</small></div>
-          <div class="g-tile"><i>🎯</i><b>Personal</b><small>โปรแกรมเฉพาะคุณ</small></div>
-          <div class="g-tile"><i>📊</i><b>InBody</b><small>ติดตามผลวัดร่างกาย</small></div>
-          <div class="g-tile"><i>💬</i><b>Feedback</b><small>ครูพลคอมเมนต์ทุกสัปดาห์</small></div></div>`,
-        list: ['สมาชิกเห็นตัวอย่างในแท็บ 🔒 <b>Club</b>', 'กด "จองเวลาคุยกับครูพล" เพื่อเริ่มเทรนและปลดล็อก'] },
+        list: ['กด <b>⏱</b> ข้างท่าเพื่อจับเวลาพักเต็มจอ หรือใช้แท็บ <b>จับเวลา</b> แบบ interval', 'มีเสียงครูพลบอกเริ่ม/พัก/หมดเวลา (เปิดเสียงเครื่องไว้)', 'กรอกน้ำหนัก/ครั้งที่ทำได้ แล้วกด <b>จบการฝึก</b> ครูพลจะเห็นและปรับโปรแกรมให้'] },
+      { k: 'Progress', h: 'Before<br>/ <span>after</span>', p: 'ครูพลบันทึกผลวัดร่างกายจากเครื่องให้ทุกครั้งที่วัด',
+        v: gPhone(`<div class="gp"><small>ไขมัน %</small><b style="font-size:15px">28.4 → <span>24.9</span></b></div>
+          <div class="gp"><small>กล้ามเนื้อ (กก.)</small><b style="font-size:15px">24.1 → <span>25.6</span></b></div>
+          <div class="gp"><small>แขน · ลำตัว · ขา</small><div class="gbar"><i style="width:96%"></i></div></div>`),
+        list: ['แท็บ <b>ความคืบหน้า</b> → เทียบครั้งแรกกับครั้งล่าสุด หรือเลือกครั้งที่อยากเทียบ', 'ดูกล้ามเนื้อ/ไขมันแยกแขน ลำตัว ขา และรูปผลวัดจากเครื่อง', 'บันทึกน้ำหนักเองได้ระหว่างรอวัดครั้งถัดไป'] },
+      { k: 'Reminder', h: 'Stay on<br><span>track</span>', p: 'ครูพลส่งอีเมลช่วยให้ฝึกตามแผน',
+        v: `<div class="g-steps">
+          <div class="g-step"><div><b>คืนก่อนวันฝึก</b><small>พรุ่งนี้ฝึกอะไร กี่ท่า</small></div></div>
+          <div class="g-step"><div><b>ถ้าลืมบันทึก</b><small>เช้าวันถัดไปจะมีอีเมลชวนกลับมาบันทึกผล</small></div></div>
+          <div class="g-step"><div><b>ทุกวันจันทร์</b><small>สรุปสัปดาห์ที่แล้ว + โปรแกรมสัปดาห์นี้</small></div></div></div>`,
+        list: ['ถ้าไม่เจอ ลองดูในโฟลเดอร์ Promotions / Spam แล้วกด "ไม่ใช่สแปม"'] },
       { k: 'Ready', h: 'You\'re<br>all <span>set</span>', p: 'เช็กลิสต์เริ่มต้น แตะเพื่อติ๊ก', check: true },
     ];
     let GI = 0;
     function guideChecklist() {
       if (typeof appChecklist === 'function') return appChecklist();
-      return [['ตั้งเป้าหมายและแผนแคลอรี่', true], ['เพิ่มไอคอนบนหน้าจอ', false], ['เริ่มฝึกวันแรก', false], ['บันทึกมื้ออาหารแรก', false], ['บันทึกน้ำหนัก', false]];
+      return [['เข้าสู่ระบบด้วยบัญชีของคุณ', true], ['เพิ่มไอคอนบนหน้าจอ', false], ['เปิดเสียงเครื่องสำหรับตัวจับเวลา', false], ['ฝึกและบันทึกผลวันแรก', false]];
     }
     function openGuide(start, onDone) {
       closeGuide();

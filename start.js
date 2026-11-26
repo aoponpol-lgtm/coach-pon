@@ -31,6 +31,8 @@
     'ใน 12 เดือนที่ผ่านมา มีปัญหากระดูก ข้อต่อ กล้ามเนื้อ หรือเอ็น ที่อาจแย่ลงถ้าออกกำลังกาย',
     'แพทย์เคยบอกว่าควรออกกำลังกายภายใต้การดูแลทางการแพทย์เท่านั้น',
   ];
+  // ปิดการขาย/สมัครเองชั่วคราว: หน้าเว็บเหลือแค่เข้าสู่ระบบ (โค้ดสมัครยังอยู่ ตั้ง true เพื่อเปิดกลับ · ต้องตรงกับ CONFIG.SALES_OPEN หลังบ้าน)
+  const SALES = false;
   let cur = 'welcome';
   let msg = '';
   // รหัสยืนยัน/รหัสผ่านที่พิมพ์ไว้ เติมกลับเมื่อสมัครไม่ผ่าน (เก็บในหน่วยความจำเท่านั้น ไม่ลง localStorage)
@@ -61,6 +63,7 @@
   const hasDraft = () => !!D.first_name;
 
   function go(s, message) {
+    if (!SALES && (s === 'welcome' || FLOW.indexOf(s) >= 0)) s = 'signin';
     cur = s;
     msg = message || '';
     if (s !== 'account') HOLD = null;
@@ -76,6 +79,7 @@
   function back() {
     const list = steps();
     const i = list.indexOf(cur);
+    if (!SALES && cur === 'reset') return go('signin');
     if (cur === 'signin' || cur === 'reset' || i <= 0) return go('welcome');
     go(list[i - 1]);
   }
@@ -290,7 +294,9 @@
           <button class="btn" id="login">Sign In</button>
           <p class="auth-forgot"><button class="link" data-go="reset">ลืมรหัสผ่าน?</button></p>
         </div>
-        <p class="foot">ยังไม่มีบัญชี? <button class="link" data-go="name">สมัครฟรี</button></p></div>`;
+        ${SALES ? '<p class="foot">ยังไม่มีบัญชี? <button class="link" data-go="name">สมัครฟรี</button></p>'
+          : '<p class="foot">สำหรับลูกเทรนของครูพล · ยังไม่มีบัญชี ติดต่อครูพลเพื่อเปิดบัญชีให้</p>'}
+        <p class="center small" id="hint" style="margin-top:10px"></p></div>`;
     },
     reset() {
       return `<div class="screen">
@@ -314,7 +320,7 @@
     $('bg').className = 'bg' + (['calories', 'macro', 'summary', 'account', 'signin', 'reset'].indexOf(cur) >= 0 ? ' dim' : '');
     $('start').innerHTML = `
       <div class="topbar">
-        <button class="backbtn" ${cur === 'welcome' ? 'style="visibility:hidden"' : ''} id="back" aria-label="ย้อนกลับ">‹</button>
+        <button class="backbtn" ${cur === 'welcome' || (!SALES && cur === 'signin') ? 'style="visibility:hidden"' : ''} id="back" aria-label="ย้อนกลับ">‹</button>
         <div class="logo"><b>Kru</b>Pon</div><span></span>
       </div>
       ${idx >= 0 ? `<div class="progress"><i style="width:${Math.round(((idx + 1) / list.length) * 100)}%"></i></div>` : ''}
@@ -325,7 +331,7 @@
     bind[cur] && bind[cur]();
     if (cur === 'account') renderGoogle('gbtn-up', 'signup_with');
     if (cur === 'signin') renderGoogle('gbtn-in', 'signin_with');
-    if (cur === 'welcome') installHint();
+    if (cur === 'welcome' || cur === 'signin') installHint();
   }
 
   /** ปุ่ม Next ใช้ได้เมื่อ ok() เป็นจริง และบันทึกค่าเมื่อกด */
@@ -566,7 +572,7 @@
       const r = await api({ action: 'login', idToken: resp.credential });
       authWait(false);
       if (r.ok) return enter(r.token);
-      if (r.error === 'not_registered') return go('name', '');
+      if (r.error === 'not_registered') return SALES ? go('name', '') : go('signin', 'อีเมลนี้ยังไม่มีบัญชี ติดต่อครูพลเพื่อเปิดบัญชีให้');
       go('signin', r.error === 'not_allowed' ? 'บัญชีนี้ถูกปิดการใช้งาน กรุณาติดต่อครูพล' : 'เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง');
     } catch (e) { authWait(false); go('signin', 'เชื่อมต่อระบบไม่ได้'); }
   }
@@ -633,7 +639,7 @@
     if (ref && /^[CM]\d{3,}$/i.test(ref)) { D.ref = ref.toUpperCase(); save(); }
     const t = ls.get(KEY);
     if (!t) {
-      // ปลุกหลังบ้านไว้ก่อนระหว่างผู้ใช้กรอกข้อมูล พอกดสมัคร/ล็อกอินจะตอบเร็วขึ้น
+      // ปลุกหลังบ้านไว้ก่อนระหว่างผู้ใช้กรอกข้อมูล พอกดล็อกอินจะตอบเร็วขึ้น
       api({ action: 'ping' }).catch(() => {});
       return go(location.hash === '#signin' ? 'signin' : 'welcome');
     }
